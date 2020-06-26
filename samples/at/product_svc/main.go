@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/dk-lockdown/seata-golang/client"
-	"github.com/dk-lockdown/seata-golang/client/at/sql/struct/cache"
+	"database/sql"
 	"net/http"
+	"time"
 )
 
 import (
@@ -11,6 +11,7 @@ import (
 )
 
 import (
+	"github.com/dk-lockdown/seata-golang/client"
 	"github.com/dk-lockdown/seata-golang/client/at/exec"
 	"github.com/dk-lockdown/seata-golang/client/config"
 	"github.com/dk-lockdown/seata-golang/client/context"
@@ -23,10 +24,17 @@ func main() {
 	r := gin.Default()
     config.InitConf(configPath)
 	client.NewRpcClient()
-	cache.SetTableMetaCache(cache.NewMysqlTableMetaCache(config.GetClientConfig().ATConfig.DSN))
 	exec.InitDataResourceManager()
 
-	db,err := exec.NewDB(config.GetClientConfig().ATConfig)
+	sqlDB, err := sql.Open("mysql",config.GetATConfig().DSN)
+	if err != nil {
+		panic(err)
+	}
+	sqlDB.SetMaxOpenConns(10)
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetConnMaxLifetime(4 * time.Hour)
+
+	db,err := exec.NewDB(config.GetATConfig(),sqlDB)
 	if err != nil {
 		panic(err)
 	}

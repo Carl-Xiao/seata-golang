@@ -11,6 +11,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+import (
+	"github.com/dk-lockdown/seata-golang/client/at/sql/schema/cache"
+)
+
 type ClientConfig struct {
 	ApplicationId		    string `yaml:"application_id" json:"application_id,omitempty"`
 	TransactionServiceGroup string `yaml:"transaction_service_group" json:"transaction_service_group,omitempty"`
@@ -24,6 +28,14 @@ var clientConfig ClientConfig
 
 func GetClientConfig() ClientConfig {
 	return clientConfig
+}
+
+func GetTMConfig() TMConfig {
+	return clientConfig.TMConfig
+}
+
+func GetATConfig() ATConfig {
+	return clientConfig.ATConfig
 }
 
 func GetDefaultClientConfig(applicationId string) ClientConfig {
@@ -59,12 +71,14 @@ func InitConf(confFile string) error {
 
 	(&clientConfig).GettyConfig.CheckValidity()
 	(&clientConfig).ATConfig.CheckValidity()
-	tmConfig = clientConfig.TMConfig
+
+	if clientConfig.ATConfig.DSN != "" {
+		cache.SetTableMetaCache(cache.NewMysqlTableMetaCache(clientConfig.ATConfig.DSN))
+	}
 	return nil
 }
 
 func InitConfWithDefault(applicationId string) {
 	clientConfig = GetDefaultClientConfig(applicationId)
 	(&clientConfig).GettyConfig.CheckValidity()
-	tmConfig = clientConfig.TMConfig
 }

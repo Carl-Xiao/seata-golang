@@ -9,10 +9,31 @@
 - [X] Memory Session Manager
 - [X] DB Session Manager (only support mysql) 
 - [ ] ETCD Session Manager  
-- [ ] Metrics Collector
+- [X] Metrics Collector
 - [X] TM
 - [X] RM TCC
 - [X] RM AT
 - [ ] Client merged request
 - [ ] Read config from Config Center
 - [ ] Unit Test
+
+### 运行 TC
+
++ 编译
+```
+cd ${projectpath}/tc/app/cmd
+go build
+```
+
++ 将编译好的程序移动到示例代码目录
+
+```
+mv cmd ${targetpath}/
+cd ${targetpath}
+```
+
++ 启动 TC
+
+```
+./cmd start -config ${projectpath}/tc/app/profiles/dev/config.yml
+```

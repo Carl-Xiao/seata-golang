@@ -6,11 +6,11 @@ import (
 )
 
 import (
-	"github.com/dk-lockdown/seata-golang/client/at/tx"
+	"github.com/dk-lockdown/seata-golang/client/at/proxy_tx"
 )
 
-type IUndoLogManager interface {
-	FlushUndoLogs(tx *tx.ProxyTx) error
+type UndoLogManager interface {
+	FlushUndoLogs(tx *proxy_tx.ProxyTx) error
 
 	Undo(db *sql.DB,xid string,branchId int64,resourceId string) error
 
@@ -21,8 +21,8 @@ type IUndoLogManager interface {
 	DeleteUndoLogByLogCreated(db *sql.DB,logCreated time.Time,limitRows int) (sql.Result,error)
 }
 
-var undoLogManager IUndoLogManager
+var undoLogManager UndoLogManager
 
-func GetUndoLogManager() IUndoLogManager {
+func GetUndoLogManager() UndoLogManager {
 	return MysqlUndoLogManager{}
 }
